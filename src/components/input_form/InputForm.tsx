@@ -16,7 +16,7 @@ const InputForm = (props: IInputForm) => {
                 Swal.fire({
                     title: 'Apakah anda Ingin Menghitung Kewajiban',
                     text: "Masukkan total kewajiban (Opsional)",
-                    input: 'text',
+                    input: 'number',
                     inputPlaceholder: 'Masukkan total kewajiban ...',
                     icon: 'info',
                     showCancelButton: true,
