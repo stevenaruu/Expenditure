@@ -13,14 +13,14 @@ export const KeinginanSlice = createSlice({
     name: 'keinginan',
     initialState,
     reducers: {
-        TAMBAH_DUIT: (state: any, action: PayloadAction<number>) => {
+        TAMBAH_KEINGINAN: (state: any, action: PayloadAction<number>) => {
             state.keinginan += action.payload
         },
-        KURANGI_DUIT: (state: any, action: PayloadAction<number>) => {
+        KURANGI_KEINGINAN: (state: any, action: PayloadAction<number>) => {
             state.keinginan -= action.payload
         },
     },
 });
 
-export const { KURANGI_DUIT } = KeinginanSlice.actions;
+export const { TAMBAH_KEINGINAN, KURANGI_KEINGINAN } = KeinginanSlice.actions;
 export const selectKeinginan = (state: RootState) => state.keinginan.keinginan;

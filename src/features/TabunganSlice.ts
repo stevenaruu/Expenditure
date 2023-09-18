@@ -13,14 +13,14 @@ export const TabunganSlice = createSlice({
     name: 'tabungan',
     initialState,
     reducers: {
-        TAMBAH_DUIT: (state: any, action: PayloadAction<number>) => {
+        TAMBAH_TABUNGAN: (state: any, action: PayloadAction<number>) => {
             state.tabungan += action.payload
         },
-        KURANGI_DUIT: (state: any, action: PayloadAction<number>) => {
+        KURANGI_TABUNGAN: (state: any, action: PayloadAction<number>) => {
             state.tabungan -= action.payload
         },
     },
 });
 
-export const { KURANGI_DUIT } = TabunganSlice.actions;
+export const { TAMBAH_TABUNGAN, KURANGI_TABUNGAN } = TabunganSlice.actions;
 export const selectTabungan = (state: RootState) => state.tabungan.tabungan;
