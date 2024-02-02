@@ -1,18 +1,19 @@
 import React, { useState } from "react"
 import { IInputForm } from "./InputForm.interfaces"
 import Swal from 'sweetalert2'
-import { useDispatch } from "react-redux"
-import { KURANGI_KEBUTUHAN, TAMBAH_KEBUTUHAN } from '../../features/KebutuhanSlice'
-import { KURANGI_KEINGINAN, TAMBAH_KEINGINAN } from '../../features/KeinginanSlice'
-import { KURANGI_TABUNGAN, TAMBAH_TABUNGAN } from '../../features/TabunganSlice'
+import { updateData } from "../../utils/db/service"
 
 const InputForm = (props: IInputForm) => {
-    const dispatch = useDispatch()
-    const { placeholder, id, button, variant } = props
+    const { placeholder, id, button, variant, kebutuhan, tabungan, keinginan, onUpdate } = props
     const [money, setMoney] = useState("")
     const handleAddMoney = () => {
         if (!isNaN(parseFloat(money))) {
             if (button === "Tambah!") {
+                const increment = async (id: string, value: number) => {
+                    await updateData("expenditures", id, value)
+                    onUpdate && onUpdate();
+                }
+
                 Swal.fire({
                     title: 'Apakah anda Ingin Menghitung Kewajiban',
                     text: "Masukkan total kewajiban (Opsional)",
@@ -27,37 +28,36 @@ const InputForm = (props: IInputForm) => {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const totalMoney = parseFloat(money) - result.value;
-                        const kebutuhan = totalMoney * 0.5;
-                        const tabungan = totalMoney * 0.3;
-                        const keinginan = totalMoney * 0.2;
-                        dispatch(TAMBAH_KEBUTUHAN(kebutuhan))
-                        dispatch(TAMBAH_TABUNGAN(tabungan))
-                        dispatch(TAMBAH_KEINGINAN(keinginan))
-                        Swal.fire(
-                            'Success!',
-                            'Kewajiban berhasil dihitung.',
-                            'success'
-                        )
+                        increment("kebutuhan", (totalMoney * 0.5) + kebutuhan);
+                        increment("tabungan", (totalMoney * 0.3) + tabungan);
+                        increment("keinginan", (totalMoney * 0.2) + keinginan);
+                        Swal.fire({
+                            title: 'Success!',
+                            html: 'Kewajiban berhasil dihitung<br><br>Kebutuhan: ' + (totalMoney * 0.5) + '<br>Tabungan: ' + (totalMoney * 0.3) + '<br>Keinginan: ' + (totalMoney * 0.2),
+                            icon: 'success'
+                        })
                     } else {
                         const totalMoney = (parseFloat(money));
-                        const kebutuhan = totalMoney * 0.5;
-                        const tabungan = totalMoney * 0.3;
-                        const keinginan = totalMoney * 0.2;
-                        dispatch(TAMBAH_KEBUTUHAN(kebutuhan))
-                        dispatch(TAMBAH_TABUNGAN(tabungan))
-                        dispatch(TAMBAH_KEINGINAN(keinginan))
-                        Swal.fire(
-                            'Success!',
-                            'Kewajiban tidak dihitung.',
-                            'success'
-                        )
+                        increment("kebutuhan", (totalMoney * 0.5) + kebutuhan);
+                        increment("tabungan", (totalMoney * 0.3) + tabungan);
+                        increment("keinginan", (totalMoney * 0.2) + keinginan);
+                        Swal.fire({
+                            title: 'Success!',
+                            html: 'Kewajiban tidak dihitung<br><br>Kebutuhan: ' + (totalMoney * 0.5) + '<br>Tabungan: ' + (totalMoney * 0.3) + '<br>Keinginan: ' + (totalMoney * 0.2),
+                            icon: 'success'
+                        })
                     }
                 })
             } else {
                 const totalMoney = (parseFloat(money));
-                if(id.slice(0, -4) === "Kebutuhan") dispatch(KURANGI_KEBUTUHAN(totalMoney));
-                else if(id.slice(0, -4) === "Tabungan") dispatch(KURANGI_TABUNGAN(totalMoney));
-                else if(id.slice(0, -4) === "Keinginan") dispatch(KURANGI_KEINGINAN(totalMoney));
+                const decrement = async (id: string, value: number) => {
+                    await updateData("expenditures", id, value)
+                    onUpdate && onUpdate();
+                }
+
+                if(id.slice(0, -4) === "Kebutuhan") decrement("kebutuhan", kebutuhan - totalMoney);
+                if(id.slice(0, -4) === "Tabungan") decrement("tabungan", tabungan - totalMoney);
+                if(id.slice(0, -4) === "Keinginan") decrement("keinginan", keinginan - totalMoney);
             }
         }
     }

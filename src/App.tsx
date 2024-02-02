@@ -1,14 +1,31 @@
+import { useEffect, useState } from "react";
 import InputForm from "./components/input_form/InputForm";
-import { selectKebutuhan } from "./features/KebutuhanSlice";
-import { selectKeinginan } from "./features/KeinginanSlice";
-import { selectTabungan } from "./features/TabunganSlice";
 import { IExpenditure } from "./interfaces/IExpenditure.interfaces";
-import { useAppSelector } from "./redux/redux";
+import { retriveData } from "./utils/db/service";
+import { IData } from "./interfaces/IData.interfaces";
 
 function App() {
-  const kebutuhan = useAppSelector(selectKebutuhan)
-  const tabungan = useAppSelector(selectTabungan)
-  const keinginan = useAppSelector(selectKeinginan)
+  const [kebutuhan, setKebutuhan] = useState(0);
+  const [tabungan, setTabungan] = useState(0);
+  const [keinginan, setKeinginan] = useState(0);
+
+  const fetchData = async () => {
+    try {
+      const db: IData[] = await retriveData("expenditures") || [];
+      db.forEach((item) => {
+        if (item.id === "kebutuhan") setKebutuhan(item.amount);
+        if (item.id === "tabungan") setTabungan(item.amount);
+        if (item.id === "keinginan") setKeinginan(item.amount);
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [])
+
   const expenditures: IExpenditure[] = [
     {
       name: "Kebutuhan 50%",
@@ -36,6 +53,10 @@ function App() {
               placeholder="Tambah Duit ..."
               button="Tambah!"
               variant="bg-emerald-600"
+              kebutuhan={kebutuhan}
+              tabungan={tabungan}
+              keinginan={keinginan}
+              onUpdate={fetchData}
             />
           </div>
         </div>
@@ -60,6 +81,10 @@ function App() {
                   placeholder={`Kurangi ${expenditure.name.slice(0, -4)} ...`}
                   button="Kurangi!"
                   variant="bg-red-500"
+                  kebutuhan={kebutuhan}
+                  tabungan={tabungan}
+                  keinginan={keinginan}
+                  onUpdate={fetchData}
                 />
               </div>
             </div>
